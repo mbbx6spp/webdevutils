@@ -3,8 +3,8 @@ package main
 import (
 	"flag"
 	"log"
-	"net/http"
 	"os"
+	"webdevutils"
 )
 
 func main() {
@@ -30,23 +30,18 @@ func main() {
 			log.Fatal("Must provide both -key and -cert options for TLS mode.")
 		}
 
-		_, err := os.Stat(keyfile)
-		if err != nil {
-			log.Fatal("keyfile: ", err)
-		}
-
-		_, err = os.Stat(certfile)
-		if err != nil {
-			log.Fatal("certfile: ", err)
-		}
 		log.Println("Using protocol: TLS")
 		log.Println("Using keyfile: ", keyfile)
 		log.Println("Using crtfile: ", certfile)
 
-		log.Panic(http.ListenAndServeTLS(ipAddr, certfile, keyfile,
-			http.FileServer(http.Dir(serveDir))))
+		err := webdevutils.StaticServerTLS(ipAddr, certfile, keyfile, serveDir)
+		if err != nil {
+			log.Panic(err)
+		}
 	} else {
-		log.Panic(http.ListenAndServe(ipAddr,
-			http.FileServer(http.Dir(serveDir))))
+		err := webdevutils.StaticServer(ipAddr, serveDir)
+		if err != nil {
+			log.Panic(err)
+		}
 	}
 }
