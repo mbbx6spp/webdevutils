@@ -5,7 +5,10 @@ import (
 	"errors"
 	"net/http"
 	"os"
+  "os/signal"
 )
+
+type trap func(<-chan os.Signal)
 
 // StaticServerTLS binds to ipAddr using certificate file, crtFile, and PEM-
 // encoded key file, keyFile, to serve static content from directory, rootDir.
@@ -70,4 +73,30 @@ func ValidateX509KeyPair(crtFile, keyFile string) error {
 	}
 
 	return nil
+}
+
+// RegisterSignalTrap will register a signal trap goroutine, signalTrap, for
+// a list of OS signals, signals.
+// Returns channel that received OS signals so that client can
+// UnregisterSignalTrap if or when needed.
+func RegisterSignalTrap(sTrap trap, sigs ...os.Signal) chan<- os.Signal {
+  c := make(chan os.Signal, 1)
+
+  for _, s := range sigs {
+    signal.Notify(c, s)
+  }
+  go sTrap(c)
+
+  return c
+}
+
+// UnregisterSignalTrap will stop signals being sent to a channel already
+// registered for specific OS signals. It will send the specified OS signal
+// to the channel after it is unregistered to receive signals from the OS.
+// This could be nil and should be handled appropriately by the goroutine
+// listening for os.Signals on the given channel passed to RegisterSignalTrap
+// originally.
+func UnregisterSignalTrap(c chan<- os.Signal, sig os.Signal) {
+  signal.Stop(c)
+  c<- sig
 }
