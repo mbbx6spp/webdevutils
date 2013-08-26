@@ -1,5 +1,7 @@
 # webdevutils
 
+[![Build Status](https://travis-ci.org/mbbx6spp/webdevutils.png?branch=travis-support)](https://travis-ci.org/mbbx6spp/webdevutils)
+
 This will contain a set of simple web development utilities that are portable
 and packaged across all \*NIX based OSes for the purpose of making web
 development less annoying. Not forcing backend developers to install NodeJS
