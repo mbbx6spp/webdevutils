@@ -14,31 +14,39 @@ test: compile
 	env CONFIGDIR=$(CONFIGDIR) go test webdevutils
 	cucumber
 
-package: linux_arm linux_amd64 linux_386
+clean:
+	rm -rf build/*
+	rm webdevutils*.rpm
+	rm webdevutils*.deb
+
+package: linux_amd64
 
 linux_386:
-	mkdir -p build/linux_386
 	export GOOS=linux GOARCH=386
-	go build -o build/$$GOOS_$$GOARCH/staticserve src/staticserve.go
-	go build -o build/$$GOOS_$$GOARCH/autocompile src/autocompile.go
-	fpm -s dir -t rpm -n "webdevutils" -v $(VERSION) -a i386 --prefix /usr/bin build/$$GOOS_$$GOARCH
-	fpm -s dir -t deb -n "webdevutils" -v $(VERSION) -a i386 --prefix /usr/bin build/$$GOOS_$$GOARCH
+	go build -o build/staticserve src/staticserve.go
+	go build -o build/autocompile src/autocompile.go
+	fpm -s dir -t rpm -n "webdevutils" -C build -v $(VERSION) \
+		-a i386 --prefix /usr/bin .
+	fpm -s dir -t deb -n "webdevutils" -C build -v $(VERSION) \
+		-a i386 --prefix /usr/bin .
 	unset GOOS GOARCH
 
 linux_amd64:
-	mkdir -p build/linux_amd64
 	export GOOS=linux GOARCH=amd64
-	go build -o build/$$GOOS_$$GOARCH/staticserve src/staticserve.go
-	go build -o build/$$GOOS_$$GOARCH/autocompile src/autocompile.go
-	fpm -s dir -t rpm -n "webdevutils" -v $(VERSION) -a x86_64 --prefix /usr/bin build/$$GOOS_$$GOARCH
-	fpm -s dir -t deb -n "webdevutils" -v $(VERSION) -a x86_64 --prefix /usr/bin build/$$GOOS_$$GOARCH
+	go build -o build/staticserve src/staticserve.go
+	go build -o build/autocompile src/autocompile.go
+	fpm -s dir -t rpm -n "webdevutils" -C build -v $(VERSION) \
+		-a x86_64 --prefix /usr/bin .
+	fpm -s dir -t deb -n "webdevutils" -C build -v $(VERSION) \
+		-a x86_64 --prefix /usr/bin .
 	unset GOOS GOARCH
 
 linux_arm:
-	mkdir -p build/linux_arm
 	export GOOS=linux GOARCH=arm
-	go build -o build/$$GOOS_$$GOARCH/staticserve src/staticserve.go
-	go build -o build/$$GOOS_$$GOARCH/autocompile src/autocompile.go
-	fpm -s dir -t rpm -n "webdevutils" -v $(VERSION) -a x86_64 --prefix /usr/bin build/$$GOOS_$$GOARCH
-	fpm -s dir -t deb -n "webdevutils" -v $(VERSION) -a x86_64 --prefix /usr/bin build/$$GOOS_$$GOARCH
+	go build -o build/staticserve src/staticserve.go
+	go build -o build/autocompile src/autocompile.go
+	fpm -s dir -t rpm -n "webdevutils" -C build -v $(VERSION) \
+		-a x86_64 --prefix /usr/bin .
+	fpm -s dir -t deb -n "webdevutils" -C build -v $(VERSION) \
+		-a x86_64 --prefix /usr/bin .
 	unset GOOS GOARCH
